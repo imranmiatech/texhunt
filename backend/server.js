@@ -22,21 +22,31 @@ const allowedOrigins = [
 ]
 
 // Middleware
-app.use(express.json())
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps or curl) or if in allowedOrigins
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(null, true); // Allow all during dev so frontend never hits CORS error
-        }
+        // Allow all origins (localhost, all vercel preview domains, production domains)
+        callback(null, true);
     },
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization", "token"]
+    allowedHeaders: ["Content-Type", "Authorization", "token", "Origin", "Accept", "X-Requested-With"]
 }))
+app.options('*', cors())
+app.use(express.json())
 
+// Ensure MongoDB is connected before handling any requests (serverless requirement)
+app.use(async (req, res, next) => {
+    try {
+        await connectDB()
+        next()
+    } catch (err) {
+        console.error("DB connection error:", err)
+        return res.status(500).json({
+            success: false,
+            message: `Database connection failed: ${err.message}. Make sure MongoDB Atlas Network Access allows 0.0.0.0/0 (all IPs) and environment variables are set in Vercel.`
+        })
+    }
+})
 // API Endpoints
 app.use('/api/user', userRouter)
 app.use('/api/product', productRouter)
