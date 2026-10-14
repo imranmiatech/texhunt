@@ -17,11 +17,8 @@ connectCloudinary()
 const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:5174",
-    "http://localhost:3000",
-    "http://localhost:4000",
-    "https://krisikunjo.shop",
-    "https://krisikunjo.vercel.app",
-    "https://krisikunjo-admin.vercel.app"
+    "https://texhunt-8m9k.vercel.app",
+    "https://texhunt-zlly-fawn.vercel.app"
 ]
 
 // Middleware
