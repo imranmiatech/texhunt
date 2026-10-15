@@ -23,15 +23,11 @@ const allowedOrigins = [
 
 // Middleware
 app.use(cors({
-    origin: (origin, callback) => {
-        // Allow all origins (localhost, all vercel preview domains, production domains)
-        callback(null, true);
-    },
+    origin: true, // Automatically reflects request origin (supports https://www.texhunt.shop, localhost, vercel previews, etc.)
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization", "token", "Origin", "Accept", "X-Requested-With"]
 }))
-app.options('*', cors())
 app.use(express.json())
 
 // Ensure MongoDB is connected before handling any requests (serverless requirement)
@@ -57,4 +53,9 @@ app.get('/', (req, res) => {
     res.send('TexHunt API is running successfully')
 })
 
-app.listen(port, () => console.log('Server started on port : ' + port))
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+    app.listen(port, () => console.log('Server started on port : ' + port))
+}
+
+export default app
+
